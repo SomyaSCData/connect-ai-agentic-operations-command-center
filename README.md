@@ -1,73 +1,65 @@
-# Connect AI – Agentic Operations Command Center
+# Operations Command Center – Agentic Architecture
 
-This project demonstrates how CData Connect AI enables autonomous agents to reason over real enterprise data without hardcoded SQL queries or JavaScript rule engines.
+This project implements an agent-driven operations monitoring system using n8n and CData Connect AI.
 
-The workflow replaces deterministic ETL logic with a structured, multi-agent architecture that performs schema discovery, risk analysis, and executive reporting.
+The workflow autonomously discovers enterprise data sources, retrieves relevant operational metrics, evaluates risk conditions, and generates executive alerts.
+
+All data exploration and query construction is performed dynamically by an AI agent using MCP tools.
 
 ---
 
 ## Overview
 
-This implementation showcases:
+The workflow performs the following:
 
-- Autonomous schema discovery
-- Agent-generated SQL queries
-- Reasoning-based risk classification
-- Structured JSON outputs between agents
-- Model specialization for performance and cost efficiency
+1. Discovers available operational datasets.
+2. Inspects relevant schemas.
+3. Retrieves aggregated operational metrics.
+4. Evaluates risk conditions using reasoning.
+5. Generates executive-level reporting.
+6. Sends alerts when required.
 
 ---
 
-## Architecture
+## Workflow Structure
 
 Schedule Trigger  
-→ Discovery Agent (claude-3-haiku + MCP tools)  
-→ Risk Analysis Agent (claude-sonnet-4-5)  
-→ Severity Gate (IF Node)  
-→ Executive Reporting Agent (claude-sonnet-4-5)  
+→ Discovery & Retrieval Agent  
+→ Risk Analysis Agent  
+→ Severity Gate  
+→ Executive Reporting Agent  
 → Email Alert  
 
 ---
 
-## Agent Responsibilities
+## Technology Stack
 
-### 1. Discovery & Retrieval Agent
-- Calls listTables
-- Inspects relevant schemas
-- Dynamically generates SQL
-- Returns aggregated operational metrics
-
-Model: claude-3-haiku
-
----
-
-### 2. Risk Analysis Agent
-- Identifies operational risks
-- Classifies severity (CRITICAL / WARNING / NORMAL)
-- Replaces deterministic rule engine logic
-
-Model: claude-sonnet-4-5
-
----
-
-### 3. Executive Reporting Agent
-- Generates executive-level summary
-- Recommends actions
-- Formats output for stakeholders
-
-Model: claude-sonnet-4-5
-
----
-
-## Requirements
-
-- n8n
+- n8n (workflow orchestration)
 - CData Connect AI (MCP endpoint)
-- Anthropic API key
-- Gmail credentials (optional)
+- Anthropic Claude models
+- Gmail (alerting)
 
 ---
 
-## Setup Instructions
+## Models Used
 
-See SETUP.md for configuration details.
+Discovery Agent: claude-3-haiku  
+Risk Analysis Agent: claude-sonnet-4-5  
+Reporting Agent: claude-sonnet-4-5  
+
+---
+
+## Repository Contents
+
+- operations-command-center-agentic.json
+- ARCHITECTURE.md
+- WORKFLOW-DETAILS.md
+- CONFIGURATION.md
+- SETUP.md
+- TROUBLESHOOTING.md
+
+---
+
+## Setup
+
+See SETUP.md for full configuration steps.
