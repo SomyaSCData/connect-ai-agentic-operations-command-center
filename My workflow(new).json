@@ -1,0 +1,359 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "subject": "Operations Alert",
+        "emailType": "text",
+        "message": "=Operations Alert\n\nOverall State: {{$json.output.overall_status}}\n\nExecutive Summary:\n{{$json.output.executive_summary}}\n\nRecommended Actions:\n{{$json.output.recommendations.join('\\n- ')}}\n\n---\nThis email was generated automatically by n8n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        16
+      ],
+      "id": "c6307354-33a3-468d-9a56-822b9287a5f5",
+      "name": "Send a message",
+      "webhookId": "103b7a97-cf3f-41bc-85fd-e18e9868c69a"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2080,
+        32
+      ],
+      "id": "4a36c324-6138-4f4c-8606-cdcc192d7523",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are preparing an executive supply chain risk report.\n\nUsing the structured risk analysis:\n\n1. Summarize key risks.\n2. Explain business impact.\n3. Provide recommended actions.\n4. Keep tone executive-level.\n\nDo not restate raw data unnecessarily.\nBe concise but actionable.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -864,
+        16
+      ],
+      "id": "c3fd0f77-4170-408d-b6e0-43b93364a194",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        192
+      ],
+      "id": "65b5b8f5-2a8e-4ef0-bccb-1abe17ad242b",
+      "name": "Anthropic Chat Model1",
+      "credentials": {
+        "anthropicApi": {
+          "id": "BDf6WNxgx1U5mys2",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"executive_summary\": \"\",\n  \"recommendations\": [],\n  \"business_impact\": \"\",\n  \"next_steps\": []\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        192
+      ],
+      "id": "49be9c36-526e-4183-9b5f-e0729efb0aea",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a supply chain data analyst.\n\nYou must complete this task in at most 4 tool calls.\n\nProcess:\n\n1. Call listTables.\n2. Identify up to 3 relevant tables related to:\n   - inventory\n   - suppliers\n   - demand\n3. Call getSchema ONLY for those tables.\n4. Run a single aggregated query per category using LIMIT 50.\n\nDo NOT:\n- Explore unrelated tables.\n- Re-query the same table twice.\n- Iterate beyond what is necessary.\n\nAfter retrieving metrics, STOP and return structured JSON:\n\n{\n  \"inventory_metrics\": {},\n  \"supplier_metrics\": {},\n  \"demand_metrics\": {}\n}",
+        "options": {
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1872,
+        32
+      ],
+      "id": "d5396bb5-a8b5-445a-a685-2fd2e371201e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://mcp.cloud.cdata.com/mcp",
+        "authentication": "headerAuth",
+        "include": "selected",
+        "includeTools": [
+          "getTables",
+          "getSchemas",
+          "queryData"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        -1728,
+        240
+      ],
+      "id": "95f21621-5713-42a8-8479-2c9b270f816a",
+      "name": "MCP Client",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5973UAtPuKxQP18S",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {
+          "maxTokensToSample": 800
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1872,
+        224
+      ],
+      "id": "56f42d36-c5b3-4941-a7a4-aa11dab18315",
+      "name": "Anthropic Chat Model2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an operations risk analyst.\n\nGiven operational metrics and findings:\n\n1. Identify risks.\n2. Detect anomalies or threshold breaches.\n3. Classify severity as:\n   - CRITICAL\n   - WARNING\n   - NORMAL\n\nBe quantitative.\nCite exact numbers.\nExplain why something is risky.\n\nReturn structured JSON:\n{\n  \"risks\": [\n     {\n       \"category\": \"\",\n       \"description\": \"\",\n       \"severity\": \"\",\n       \"evidence\": \"\"\n     }\n  ],\n  \"overall_severity\": \"\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1520,
+        32
+      ],
+      "id": "a2374dd6-dc89-4cd9-a15a-4adcb34906f1",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1520,
+        224
+      ],
+      "id": "796f6f80-64df-413f-b44f-0e6b17f13d7e",
+      "name": "Anthropic Chat Model3",
+      "credentials": {
+        "anthropicApi": {
+          "id": "BDf6WNxgx1U5mys2",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cf4d22e7-5e09-46e1-96d3-28db0b2ca62a",
+              "leftValue": "overall_severity",
+              "rightValue": "NORMAL",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1168,
+        32
+      ],
+      "id": "c0681489-fa72-4272-8d45-6c95a0b8f9c1",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "28e4683c-aa66-486c-b6a1-807722205694",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a849efec816c088203ee720673690985a0baae6dee4de68a09bcac9e82659058"
+  },
+  "id": "pqlojke0tmohK5q6",
+  "tags": []
+}
