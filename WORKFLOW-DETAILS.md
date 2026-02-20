@@ -45,7 +45,7 @@ Given operational metrics:
    - NORMAL
 
 Be quantitative.
-Cite evidence.
+Cite supporting evidence.
 
 Return structured JSON:
 
@@ -73,4 +73,4 @@ Using structured risk analysis:
 2. Explain business impact.
 3. Recommend actions.
 4. Maintain executive tone.
-5. Avoid restating raw data.
+5. Avoid repeating raw metrics.
