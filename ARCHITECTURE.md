@@ -1,69 +1,65 @@
-# Architecture Overview
+# Operations Command Center – Agentic Architecture
 
-This workflow transitions from a deterministic ETL model to an agentic reasoning model.
+This project implements an agent-driven operations monitoring system using n8n and CData Connect AI.
 
----
+The workflow autonomously discovers enterprise data sources, retrieves relevant operational metrics, evaluates risk conditions, and generates executive alerts.
 
-## Design Principles
-
-The previous architecture relied on:
-
-- Hardcoded SQL queries
-- JavaScript-based threshold logic
-- Manual iteration and merging
-
-The new architecture leverages:
-
-- Tool-augmented agents
-- Structured multi-agent flow
-- Autonomous schema discovery
-- Controlled reasoning boundaries
+All data exploration and query construction is performed dynamically by an AI agent using MCP tools.
 
 ---
 
-## Agent 1: Discovery & Retrieval
+## Overview
 
-Capabilities:
-- listTables
-- getSchema
-- queryData
+The workflow performs the following:
 
-Constraints:
-- Maximum 4 tool calls
-- Aggregated queries only
-- LIMIT 50 enforced
-- Stops once sufficient metrics are retrieved
-
-Model:
-claude-3-haiku
+1. Discovers available operational datasets.
+2. Inspects relevant schemas.
+3. Retrieves aggregated operational metrics.
+4. Evaluates risk conditions using reasoning.
+5. Generates executive-level reporting.
+6. Sends alerts when required.
 
 ---
 
-## Agent 2: Risk Analysis
+## Workflow Structure
 
-Input:
-Structured operational metrics from Agent 1.
-
-Responsibilities:
-- Detect threshold breaches
-- Identify anomalies
-- Classify severity
-- Provide quantitative evidence
-
-Model:
-claude-sonnet-4-5
+Schedule Trigger  
+→ Discovery & Retrieval Agent  
+→ Risk Analysis Agent  
+→ Severity Gate  
+→ Executive Reporting Agent  
+→ Email Alert  
 
 ---
 
-## Agent 3: Executive Reporting
+## Technology Stack
 
-Input:
-Structured risk classification from Agent 2.
+- n8n (workflow orchestration)
+- CData Connect AI (MCP endpoint)
+- Anthropic Claude models
+- Gmail (alerting)
 
-Output:
-- Executive summary
-- Business impact explanation
-- Recommended next steps
+---
 
-Model:
-claude-sonnet-4-5
+## Models Used
+
+Discovery Agent: claude-3-haiku  
+Risk Analysis Agent: claude-sonnet-4-5  
+Reporting Agent: claude-sonnet-4-5  
+
+---
+
+## Repository Contents
+
+- operations-command-center-agentic.json
+- ARCHITECTURE.md
+- WORKFLOW-DETAILS.md
+- CONFIGURATION.md
+- SETUP.md
+- TROUBLESHOOTING.md
+
+---
+
+## Setup
+
+See SETUP.md for full configuration steps.
