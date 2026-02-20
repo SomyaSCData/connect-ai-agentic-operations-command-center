@@ -1,65 +1,73 @@
-# Operations Command Center – Agentic Architecture
+# Architecture
 
-This project implements an agent-driven operations monitoring system using n8n and CData Connect AI.
+This workflow implements a structured multi-agent pipeline for operational monitoring.
 
-The workflow autonomously discovers enterprise data sources, retrieves relevant operational metrics, evaluates risk conditions, and generates executive alerts.
-
-All data exploration and query construction is performed dynamically by an AI agent using MCP tools.
+Each stage has a clearly defined responsibility.
 
 ---
 
-## Overview
+## Stage 1 – Discovery & Retrieval Agent
 
-The workflow performs the following:
+Purpose:
+Explore enterprise datasets and retrieve operational metrics.
 
-1. Discovers available operational datasets.
-2. Inspects relevant schemas.
-3. Retrieves aggregated operational metrics.
-4. Evaluates risk conditions using reasoning.
-5. Generates executive-level reporting.
-6. Sends alerts when required.
+Capabilities:
+- listTables
+- getSchema
+- queryData
 
----
+Constraints:
+- Maximum 4 tool calls
+- Aggregated queries only
+- LIMIT 50 enforced
+- Stops once sufficient metrics are collected
 
-## Workflow Structure
+Model:
+claude-3-haiku
 
-Schedule Trigger  
-→ Discovery & Retrieval Agent  
-→ Risk Analysis Agent  
-→ Severity Gate  
-→ Executive Reporting Agent  
-→ Email Alert  
-
----
-
-## Technology Stack
-
-- n8n (workflow orchestration)
-- CData Connect AI (MCP endpoint)
-- Anthropic Claude models
-- Gmail (alerting)
+Output:
+Structured JSON containing operational metrics.
 
 ---
 
-## Models Used
+## Stage 2 – Risk Analysis Agent
 
-Discovery Agent: claude-3-haiku  
-Risk Analysis Agent: claude-sonnet-4-5  
-Reporting Agent: claude-sonnet-4-5  
+Purpose:
+Evaluate operational metrics and identify risk conditions.
+
+Responsibilities:
+- Detect anomalies
+- Identify threshold breaches
+- Classify severity
+- Provide quantitative evidence
+
+Model:
+claude-sonnet-4-5
+
+Output:
+Structured JSON with risk classifications and overall severity.
 
 ---
 
-## Repository Contents
+## Stage 3 – Severity Gate
 
-- operations-command-center-agentic.json
-- ARCHITECTURE.md
-- WORKFLOW-DETAILS.md
-- CONFIGURATION.md
-- SETUP.md
-- TROUBLESHOOTING.md
+Purpose:
+Prevent unnecessary alerts.
+
+Logic:
+Only proceed if overall_severity is WARNING or CRITICAL.
 
 ---
 
-## Setup
+## Stage 4 – Executive Reporting Agent
 
-See SETUP.md for full configuration steps.
+Purpose:
+Generate executive-level report and recommended actions.
+
+Responsibilities:
+- Summarize risks
+- Explain business impact
+- Recommend next steps
+
+Model:
+claude-sonnet-4-5
