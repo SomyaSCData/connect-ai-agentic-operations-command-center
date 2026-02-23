@@ -1,4 +1,4 @@
-# Configuration
+# Configuration Guide
 
 ## MCP Credential Setup (n8n)
 
