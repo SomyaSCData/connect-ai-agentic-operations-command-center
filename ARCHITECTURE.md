@@ -1,17 +1,17 @@
-# Architecture
+# Architecture Overview
 
-This workflow implements a structured multi-agent pipeline for operational monitoring.
+This workflow implements a structured, multi-agent operational monitoring system using n8n and CData Connect AI.
 
-Each stage has a clearly defined responsibility.
+The architecture separates responsibilities across distinct stages to ensure clarity, scalability, and maintainability.
 
 ---
 
 ## Stage 1 – Discovery & Retrieval Agent
 
 Purpose:
-Explore enterprise datasets and retrieve operational metrics.
+Explore available enterprise datasets and retrieve relevant operational metrics.
 
-Capabilities:
+Tool Access:
 - listTables
 - getSchema
 - queryData
@@ -20,7 +20,7 @@ Constraints:
 - Maximum 4 tool calls
 - Aggregated queries only
 - LIMIT 50 enforced
-- Stops once sufficient metrics are collected
+- Stops once sufficient metrics are retrieved
 
 Model:
 claude-3-haiku
@@ -45,29 +45,35 @@ Model:
 claude-sonnet-4-5
 
 Output:
-Structured JSON with risk classifications and overall severity.
+Structured JSON:
+
+{
+  "risks": [...],
+  "overall_severity": ""
+}
 
 ---
 
 ## Stage 3 – Severity Gate
 
 Purpose:
-Prevent unnecessary alerts.
+Prevent unnecessary alert generation.
 
 Logic:
-Only proceed if overall_severity is WARNING or CRITICAL.
+Proceed only if overall_severity is WARNING or CRITICAL.
 
 ---
 
 ## Stage 4 – Executive Reporting Agent
 
 Purpose:
-Generate executive-level report and recommended actions.
+Generate executive-level summary and recommended actions.
 
 Responsibilities:
-- Summarize risks
+- Summarize key risks
 - Explain business impact
 - Recommend next steps
+- Maintain professional tone
 
 Model:
 claude-sonnet-4-5
